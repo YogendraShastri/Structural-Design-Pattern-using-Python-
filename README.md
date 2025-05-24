@@ -270,7 +270,6 @@ The Facade Pattern helps hide these complex parts and gives you a smooth, clean 
 **Structure**
 ![image](https://github.com/user-attachments/assets/06ab9881-f880-4ae1-9629-c4a16f3f5a60)
 
-
 **Code** : 
 ```python
 # Facade Design Pattern
@@ -317,4 +316,262 @@ Pasta Prepared, Order Served
 - There are three subsystems (subsystem1, subsystem2, subsystem3).
 - Waiter class creates the objects for each sub system class.
 - By Creating the object of the waiter class we can access all three subsystem classes as Waiter class act as facade.
- 
+
+### Bridge Pattern :
+The **Bridge Design Pattern** is a structural pattern that decouples an abstraction from its implementation so that the two can vary independently.
+
+It’s useful when you want to separate an object's interface from its implementation, allowing them to evolve separately without affecting each other. in simple words The bridge pattern allows the Abstraction and the Implementation to be developed independently and the client code can access only the Abstraction part without being concerned about the Implementation part, for Example : 
+
+You have different remotes (like basic remote, smart remote), and they can control different devices (like TV, Radio, Projector).
+Instead of creating separate classes for every combination (e.g., SmartTVRemote, BasicRadioRemote, etc.), the Bridge Pattern helps you separate Remotes (Abstraction) from Devices (Implementation).
+
+**Structure**:
+![image](https://github.com/user-attachments/assets/db98bb95-4e62-4c02-895b-25f70ff546de)
+
+**Code** : 
+```python
+# """ 
+#                       [ implementation ]                                    [ Abstraction ]
+#
+#                             Device                                               Remote
+#                 { PowerOn, PowerOff, set_channel}  --------------  { toggle_power, change_chennel}
+#                        /             \                                      /               \ 
+#                       /               \                                    /                 \ 
+#                  TV(Device)           Radio(Device)                SmartRemote(Remote)     BasicRemote(Remote)
+# """
+
+from abc import ABC, abstractmethod
+
+class Device(ABC):
+
+    @abstractmethod
+    def power_on(self):
+        pass
+
+    @abstractmethod
+    def power_off(self):
+        pass
+
+    def change_channel(self, channel):
+        pass
+
+class TV(Device):
+
+    def power_on(self):
+        print("TV is Powering ON")
+
+    def power_off(self):
+        print("TV is powering OFF")
+
+    def change_channel(self, channel):
+        print(f"TV is set to channel : {channel}")
+
+class Radio(Device):
+
+    def power_on(self):
+        print("Radio is powering on")
+    
+    def power_off(self):
+        print("Radtio is powering off")
+
+    def change_channel(self, channel):
+        print(f"Radio channel set to {channel}")
+
+#abstraction
+class Remote(ABC):
+    def __init__(self, device):
+        self.device = device
+
+    @abstractmethod
+    def toggle_power(self, power):
+        pass
+
+    @abstractmethod
+    def set_channel(self, channel):
+        pass
+
+class SmartRemote(Remote):
+
+    def toggle_power(self, power):
+        if power == "ON":
+            return f"Smart Remote : {self.device.power_on()}"
+        else:
+            return f"Smart Remote : {self.device.power_off()}"
+    
+    def set_channel(self, channel):
+        return f"SmartRemote : {self.device.change_channel(channel)}"
+    
+    def subscription(self):
+        print("Use Hotstar, Sony liv  or Netflix")
+    
+class BasicRemote(Remote):
+
+    def toggle_power(self, power):
+        if power == "On":
+            return f"Basic Remote : {self.device.power_on()}"
+        else:
+            return f"Basic Remote : {self.device.power_off()}"
+    
+    def set_channel(self, channel):
+        return f"Basic Remote : {self.device.change_channel(channel)}"
+
+
+if __name__ == "__main__":
+    tv = TV()
+    radio = Radio()
+
+    tv_remote = SmartRemote(tv)
+    radio_remote = BasicRemote(radio)
+    
+    tv_remote.toggle_power("ON")
+    tv_remote.set_channel(23)
+    tv_remote.subscription()
+    tv_remote.toggle_power("OFF")
+
+    print("\n")
+    radio_remote.toggle_power("ON")
+    radio_remote.set_channel(94.6)
+    radio_remote.toggle_power("OFF")
+
+```
+**Output**
+```python
+TV is Powering ON
+TV is set to channel : 23
+Use Hotstar, Sony liv  or Netflix
+TV is powering OFF
+
+
+Radtio is powering off
+Radio channel set to 94.6
+Radtio is powering off
+```
+
+**How it Works**:
+- The pattern defines an abstraction (e.g., Remote) that contains a reference to an implementation interface (e.g., Device)
+- The Remote (abstraction) and Device (implementation) hierarchies are independent, allowing new remotes or devices to be added without modifying the other hierarchy.
+
+### Composite Pattern:
+The **Composite Design Pattern** is a structural pattern that allows you to compose objects into tree-like structures to represent part-whole hierarchies. It lets clients treat individual objects and compositions of objects uniformly, enabling recursive processing of complex structures.
+
+In simple word Composite means made up of variours elements,  there are two major components one is part (leaf)  and another is whole, if in an orgnization there is a L7 manager who manages 2 L6 managers and 5 L5 Employees than, all the Employees are considered as Part or Leaf, but Managers will be considered as Whole, as each L6 Manager, Manages the team of 2 L4 Employees. Lets see Diagram :
+
+**Key Components :** 
+* Client
+* Component (Interface)
+* Leaf or Part
+* Composite or Whole
+
+**Structure**:
+![image](https://github.com/user-attachments/assets/97968ac6-7d57-46ac-bb35-d59a397b81ec)
+
+The core idea behind the Composite Design Pattern revolves around the ability to treat individual objects and composites uniformly, especially with operations like:
+**Add(component)** – Add a part (leaf or composite) to a composite.
+**Remove(component)** – Remove a part from a composite.
+**Operation()** – Perform an operation (e.g., display, calculate) on both individual objects and groups.
+
+**Code** : 
+```python
+from abc import ABC, abstractmethod
+
+# Interface
+class Employee(ABC):
+
+    @abstractmethod
+    def do_work(self):
+        pass
+
+    @abstractmethod
+    def emp_details(self):
+        pass
+
+
+# Leaf - Developer
+class Developer(Employee):
+    def __init__(self, name):
+        self.name = name
+
+    def do_work(self):
+        print(f"{self.name} is doing Development Task")
+
+    def emp_details(self):
+        print(f"Name: {self.name}, Position: Developer")
+
+
+# Leaf - Tester
+class Tester(Employee):
+    def __init__(self, name):
+        self.name = name
+
+    def do_work(self):
+        print(f"{self.name} is doing Testing Task")
+
+    def emp_details(self):
+        print(f"Name: {self.name}, Position: Tester")
+
+
+# Composite - Manager
+class Manager(Employee):
+    def __init__(self, name):
+        self.name = name
+        self.team = []
+
+    def add_employee(self, emp: Employee):
+        self.team.append(emp)
+
+    def remove_employee(self, emp: Employee):
+        self.team.remove(emp)
+
+    def do_work(self):
+        print(f"{self.name} is managing the team:")
+        for emp in self.team:
+            emp.do_work()
+
+    def emp_details(self):
+        print(f"Name: {self.name}, Position: Manager, Team Members:")
+        for emp in self.team:
+            emp.emp_details()
+
+
+# Client
+if __name__ == "__main__":
+    dev1 = Developer("Raj")
+    dev2 = Developer("Shyam")
+    tester1 = Tester("Devesh")
+
+    manager = Manager("Yogi")
+    manager.add_employee(dev1)
+    manager.add_employee(dev2)
+    manager.add_employee(tester1)
+
+    manager.emp_details()
+    print("\n--- Work in progress ---\n")
+    manager.do_work()
+```
+
+**Output**
+```python
+Name: Yogi, Position: Manager, Team Members:
+Name: Raj, Position: Developer
+Name: Shyam, Position: Developer
+Name: Devesh, Position: Tester
+
+--- Work in progress ---
+
+Yogi is managing the team:
+Raj is doing Development Task
+Shyam is doing Development Task
+Devesh is doing Testing Task
+
+Process finished with exit code 0
+```
+**How it Works**:
+* Manager acts as a composite and holds a team of Employee objects.
+* Developer and Tester are leaves.
+* The client code can treat both individuals and groups uniformly using the Employee interface.
+
+
+
+
+
+
